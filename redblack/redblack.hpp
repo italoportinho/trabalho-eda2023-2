@@ -399,6 +399,7 @@ void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvore* x, NoArvore* x_pai) {
 void _rb_transplant(ArvoreRedBlack* T, NoArvore* u, NoArvore* v) {
     if (u->pai == 0) {
         T->raiz = v;
+        v->pai = 0;
     } else {
         if (u == u->pai->esq) {
             u->pai->esq = v;  // v pode ser NIL
@@ -439,27 +440,29 @@ void _rbdelete(ArvoreRedBlack* arvore, NoArvore* z) {
             //  sobe seu sucessor na árvore.
             aux_y = TreeSucessor(z);
             cor_original_y = aux_y->cor;
-            aux_x = aux_y->dir;
+            aux_x = aux_y->dir;  // pode ser NIL
             if (aux_y->pai == z) {
                 // o sucessor de z é um filho direto.
                 if (aux_x) {
                     aux_x->pai = aux_y;
-                    aux_x_pai = aux_y;  // ??? o pai de x já é Y
-                } else {
-                    // Y nao é filho direto. z possui uma arvore da direita.
-                    // portanto z.dir nao sera nulo
-                    _rb_transplant(arvore, aux_y, aux_y->dir);
-                    aux_y->dir = z->dir;
-                    aux_y->dir->pai = aux_y;
+                      // ??? o pai de x já é Y
                 }
-                _rb_transplant(arvore, z, aux_y);
-                aux_y->esq = z->esq;
-                // z tem os dois filhos, portanto z.esq, q agora é tb o valor
-                // de y.esq, nao é nulo.
-                aux_y->esq->pai = aux_y;
-                aux_y->cor = z->cor;
+                aux_x_pai = aux_y;
+            } else {
+                aux_x_pai = aux_y->pai;
+                // Y nao é filho direto. z possui uma arvore da direita.
+                // portanto z.dir nao sera nulo
+                _rb_transplant(arvore, aux_y, aux_y->dir);
+                aux_y->dir = z->dir;
+                aux_y->dir->pai = aux_y;
             }
         }
+        _rb_transplant(arvore, z, aux_y);
+        aux_y->esq = z->esq;
+        // z tem os dois filhos, portanto z.esq, q agora é tb o valor
+        // de y.esq, nao é nulo.
+        aux_y->esq->pai = aux_y;
+        aux_y->cor = z->cor;
     }
 
     if (cor_original_y == BLACK) {
