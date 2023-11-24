@@ -72,18 +72,22 @@ void pre_ordem(NoArvore* no) {
 void RightRotate(ArvoreRedBlack* arvore, NoArvore* no) {
     // Complexidade: O(1)
     // A esquerda do nó x vira a dir do seu filho da esquerda y.
+    // E X vira filho da direita de Y
+    // obs: tem que ter Y, senão nao tem oq rotacionar.
+    printf("\nRIGHT-ROTATE\n");
     printf("\n X = %d\n", no->dado);
     printf("\n Y = %d\n", no->esq->dado);
     NoArvore* aux_y = no->esq;
-    no->esq = aux_y->dir;
 
     // O pai de y agora é o pai de x.
-    // Este trecho é igual a LeftRotate
     aux_y->pai = no->pai;
+
+    // a direita de Y agora é esquerda de X
+    no->esq = aux_y->dir;
+    // E se a direita de Y não NIL, tb atualizamos seu pai para X.
     if (aux_y->dir) {
         aux_y->dir->pai = no;
     }
-
     // Definir se y fica a esq ou dir do pai do no x (se houver).
     // Este trecho é igual a LeftRotate
     if (no->pai == 0) {
@@ -106,20 +110,24 @@ void RightRotate(ArvoreRedBlack* arvore, NoArvore* no) {
 void LeftRotate(ArvoreRedBlack* arvore, NoArvore* no /* X */) {
     // Complexidade: O(1)
     // A direita do nó x vira a esquerda do seu filho da direita y.
+    // E x vira filho da esquerda de Y
+    // obs: tem que ter Y, senão nao tem oq rotacionar.
+    printf("\nLEFT-ROTATE\n");
     printf("\n X = %d\n", no->dado);
-    printf("\n Y = %d\n", no->dir->dado);
+    printf("\n Y = %d\n", no->dir ? no->dir->dado : 0);
     NoArvore* aux_y = no->dir;
-    no->dir = aux_y->esq;
-
-    // o pai do filho da esquerda de Y agora é o nó X.
-    if (aux_y->esq) {
-        aux_y->esq->pai = no;
-    }
 
     // O pai de y agora é o pai de x.
     aux_y->pai = no->pai;
 
+    // a direita de Y agora é esquerda de X
+    no->dir = aux_y->esq;
+    // E se a esquerda de Y não NIL, tb atualizamos seu pai para X.
+    if (aux_y->esq) {
+        aux_y->esq->pai = no;
+    }
     // Definir se y fica a esq ou dir do pai do no x (se houver).
+    // Este trecho é igual a LeftRotate
     if (no->pai == 0) {
         arvore->raiz = aux_y;
     } else {
@@ -152,26 +160,26 @@ NoArvore* _rbinsert_fixup(ArvoreRedBlack* arvore, NoArvore* no) {
         if (aux_z->pai == aux_z->pai->pai->esq) {
             // y é o tio da direita de z.
             aux_y = aux_z->pai->pai->dir;
-            if (aux_y->cor == RED) {
+            if (aux_y != 0 && aux_y->cor == RED) {
                 // CASO 1
-                printf("\nCASO 1 (IF)\n");
+                printf("\nCASO 1 (IF) - TIO VERMELHO\n");
                 aux_z->pai->cor = BLACK;
                 aux_y->cor = BLACK;
                 aux_z->pai->pai->cor = RED;
-                aux_z = aux_z->pai->pai;
+                aux_z = aux_z->pai->pai;  // se possui tio, possui avo
             } else {
-                // Se o tio do no z for preto entramos nos casos 2 e 3.
+                // Se o tio do no z for preto (ou NIL) entramos nos casos 2 e 3.
                 // No caso 2 z é filho da direita e no 3 é filho da esquerda.
                 if (aux_z == aux_z->pai->dir) {
                     // CASO 2: z é filho da direita
                     aux_z = aux_z->pai;
-                    printf("\n CASO 2: LEFT-ROTATE(IF)\n");
+                    printf("\n CASO 2: z,pai e avo formam triang. Rotac pai\n");
                     LeftRotate(arvore, aux_z);
                 } else {
                     // CASO 3: z é filho da esquerda
                     aux_z->pai->cor = BLACK;
                     aux_z->pai->pai->cor = RED;
-                    printf("\n CASO 3: RIGHT-ROTATE(IF)\n");
+                    printf("\n CASO 3: z,pai e avo formam linha. Rotac avo\n");
                     RightRotate(arvore, aux_z->pai->pai);
                 }
             }
@@ -183,7 +191,7 @@ NoArvore* _rbinsert_fixup(ArvoreRedBlack* arvore, NoArvore* no) {
             aux_y = aux_z->pai->pai->esq;
             if (aux_y != 0 && aux_y->cor == RED) {
                 // CASO 1
-                printf("\nCASO 1 (ELSE)\n");
+                printf("\nCASO 1.dir (ELSE) - TIO VERMELHO\n");
                 aux_z->pai->cor = BLACK;
                 aux_y->cor = BLACK;
                 aux_z->pai->pai->cor = RED;
@@ -192,13 +200,13 @@ NoArvore* _rbinsert_fixup(ArvoreRedBlack* arvore, NoArvore* no) {
                 // CASO 2
                 if (aux_z == aux_z->pai->esq) {
                     aux_z = aux_z->pai;
-                    printf("\n CASO 2: RIGHT-ROTATE(ELSE)\n");
+                    printf("\n CASO 2.dir: z,pai,avo formam triang. Rot pai\n");
                     RightRotate(arvore, aux_z);
                 } else {
                     // CASO 3: z é filho da direita
                     aux_z->pai->cor = BLACK;
                     aux_z->pai->pai->cor = RED;
-                    printf("\n CASO 3: LEFT-ROTATE(ELSE)\n");
+                    printf("\n CASO 3.dir: z,pai,avo formam linha. Rot avo\n");
                     LeftRotate(arvore, aux_z->pai->pai);
                 }
             }
@@ -246,6 +254,7 @@ NoArvore* Insert(ArvoreRedBlack* arvore, int elemento) {
     printf("\n*************************************************\n");
     printf("**************** Inserindo %d *******************", elemento);
     printf("\n*************************************************\n");
+
     NoArvore* new_node = new NoArvore {
         .dado = elemento
         , .cor = RED
@@ -300,140 +309,161 @@ NoArvore* Search(ArvoreRedBlack* arvore, int elemento) {
     return no;
 }
 
-void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvore* no /* X */) {
-    NoArvore* aux_w;
-    while (no != arvore->raiz && no->cor == BLACK) {
-        if (no == no->pai->esq) {
-            // O nó X é filho da esquerda
-            aux_w = no->pai->dir;
-            if (aux_w->cor == RED) {
-                // CASO 1 do Cormen
-                printf("\nCASO 1 do Cormen - X filho da esquerda\n");
-            }
-            if (aux_w->esq->cor == BLACK && aux_w->dir->cor == BLACK) {
-                // CASO 2 do Cormen
-                printf("\nCASO 2 do Cormen - X filho da esquerda\n");
-            } else {
-                if (aux_w->dir->cor == BLACK) {
-                    // CASO 3 do Cormen
-                    printf("\nCASO 3 do Cormen - X filho da esquerda\n");
+void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvore* x, NoArvore* x_pai) {
+    NoArvore* irmao = 0;
+    while (x != arvore->raiz && (x == 0 || x->cor == BLACK)) {
+        printf("\nX == %d\n", x ? x->dado : 0);
+        printf("\nX.pai == %d\n", x_pai ? x_pai->dado : 0);
+        if (x == x_pai->esq) {
+            // X é filho da esquerda
+            irmao = x_pai->dir;
+            printf("\nirmao == %d\n", irmao->dado);
+            printf("\nirmao.cor == %d\n", irmao->cor);
+            printf("\nirmao.esq == %d\n", irmao->esq ? irmao->esq->dado : 0);
+            printf("\nirmao.dir == %d\n", irmao->dir ? irmao->dir->dado : 0);
+            if (irmao) {
+                if (irmao->cor == RED) {
+                    printf("\nDELETE FIX CASO 1 - irmão vermelho\n");
+                    irmao->cor = BLACK;
+                    x_pai->cor = RED;
+                    LeftRotate(arvore, x_pai);
+                }
+                if((!irmao->esq || irmao->esq->cor == BLACK) && (!irmao->dir || irmao->dir->cor == BLACK)) {
+                    printf("\nDELETE FIX CASO 2 - irmao com ambos filhos pretos\n");
+                    irmao->cor = RED;
+                    x = x_pai;
+                    printf("\nNOVO X == %d\n", x ? x->dado : 0);
                 } else {
-                    // CASO 4 do Cormen
-                    printf("\nCASO 4 do Cormen - X filho da esquerda\n");
+                    if (irmao->dir && irmao->dir->cor == BLACK) {
+                        printf("\nDELETE FIX CASO 3 - irmao possui um filho preto\n");
+                        if (irmao->esq) {
+                            irmao->esq->cor = BLACK;
+                        }
+                        irmao->cor = RED;
+                        RightRotate(arvore, irmao);
+                        irmao = x_pai->dir;
+                    }
+                    printf("\nDELETE FIX CASO 4 - irmao tem filho vermehlo\n");
+                    irmao->cor = x_pai->cor;
+                    x_pai->cor = BLACK;
+                    if(irmao->dir) {
+                        irmao->dir->cor = BLACK;
+                    }
+                    LeftRotate(arvore, x_pai);
+                    x = arvore->raiz;
                 }
             }
         } else {
-            /* Simétrico com esquerda e direita trocados */
-            // O nó X é filho da direita
-            aux_w = no->pai->esq;
-            if (aux_w->cor == RED) {
-                // CASO 1 do Cormen
-                printf("\nCASO 1 do Cormen - X filho da DIREITA\n");
-            }
-            if (aux_w->dir->cor == BLACK && aux_w->esq->cor == BLACK) {
-                // CASO 2 do Cormen
-                printf("\nCASO 2 do Cormen - X filho da DIREITA\n");
-            } else {
-                if (aux_w->esq->cor == BLACK) {
-                    // CASO 3 do Cormen
-                    printf("\nCASO 3 do Cormen - X filho da DIREITA\n");
+            // x é filho da direita
+            irmao = x_pai->esq;
+            if (irmao) {
+                if (irmao->cor == RED) {
+                    printf("\nDELETE FIX CASO 1 - irmão vermelho\n");
+                    irmao->cor = BLACK;
+                    x_pai->cor = RED;
+                    RightRotate(arvore, x_pai);
+                }
+                if((!irmao->esq || irmao->esq->cor == BLACK) && (!irmao->dir || irmao->dir->cor == BLACK)) {
+                    printf("\nDELETE FIX CASO 2 - irmao com ambos filhos pretos\n");
+                    irmao->cor = RED;
+                    x = x_pai;
                 } else {
-                    // CASO 4 do Cormen
-                    printf("\nCASO 4 do Cormen - X filho da DIREITA\n");
+                    if (irmao->esq && irmao->esq->cor == BLACK) {
+                        printf("\nDELETE FIX CASO 3 - irmao possui um filho preto\n");
+                        if (irmao->dir) {
+                            irmao->dir->cor = BLACK;
+                        }
+                        irmao->cor = RED;
+                        LeftRotate(arvore, irmao);
+                        irmao = x_pai->esq;
+                    }
+                    printf("\nDELETE FIX CASO 4 - irmao tem filho vermehlo\n");
+                    irmao->cor = x_pai->cor;
+                    x_pai->cor = BLACK;
+                    if(irmao->esq) {
+                        irmao->esq->cor = BLACK;
+                    }
+                    RightRotate(arvore, x_pai);
+                    x = arvore->raiz;
                 }
             }
+        }
+    }
+    if (x) {
+        x->cor = BLACK;
+    }
+    return;
+}
+
+// Desfaz a conexão entre os nos u e v. e seta o pai de v como o pai de u.
+void _rb_transplant(ArvoreRedBlack* T, NoArvore* u, NoArvore* v) {
+    if (u->pai == 0) {
+        T->raiz = v;
+    } else {
+        if (u == u->pai->esq) {
+            u->pai->esq = v;  // v pode ser NIL
+        } else {
+            u->pai->dir = v;  // v pode ser NIL
+        }
+        if (v) {
+            v->pai = u->pai;
         }
     }
     return;
 }
 
-void _rbdelete(ArvoreRedBlack* arvore, NoArvore* no) {
-    NoArvore* aux_y = 0;
+void _rbdelete(ArvoreRedBlack* arvore, NoArvore* z) {
+    NoArvore* aux_y = z;
     NoArvore* aux_x = 0;
-    if (no->esq == 0) {
-        if (no->dir == 0) {
-            // CASO 1: nó z, nao tem filhos.
-            printf("\nCASO 1: no z, nao tem filhos.\n");
-            // Atualizamos o ponteiro do pai para null.
-            if (no == no->pai->esq) {
-                no->pai->esq = 0;
-            } else {
-                no->pai->dir = 0;
-            }
-            no = 0;
-        } else {
-            printf("\nCASO 2: no z tem apenas um filho(dir).\n");
-            // CASO 2: nó z tem apenas um filho.
-            // nó z tem filho direito.
-            // definir se nó z é filho direito ou esquerdo de seu pai.
-            if (no == no->pai->esq) {
-                no->pai->esq = no->dir;
-            } else {
-                no->pai->dir = no->dir;
-            }
-            no->dir->pai = no->pai;
-            aux_y = no;
-            if (aux_y->esq) {
-                aux_x = aux_y->esq;
-            } else {
-                aux_x = aux_y->dir;
-            }
-            aux_x->pai = aux_y->pai;
-            no = 0;
-        }
+    NoArvore* aux_x_pai = 0;
+    color cor_original_y = aux_y->cor;
+
+    if (!z->esq) {
+        // z nao tem filho da esquerda (ou nenhum filho).
+        // sobe o filho da direita (ou NIL).
+        aux_x = z->dir;
+        aux_x_pai = z->pai;
+        _rb_transplant(arvore, z, z->dir);
+
     } else {
-        // nó z tem pelo menos filho esquerdo.
-        if (no->dir == 0) {
-            printf("\nCASO 2: no z tem apenas um filho(esq).\n");
-            // CASO 2: nó z tem apenas um filho.
-            // nó z tem filho esquerdo.
-            // definir se nó z é filho direito ou esquerdo de seu pai.
-            // E atualizar o filho esq/dir do pai do no com
-            // o filho esquerdo do nó
-            if (no == no->pai->esq) {
-                no->pai->esq = no->esq;
-            } else {
-                no->pai->dir = no->esq;
-            }
-            aux_y = no;
-            if (aux_y->esq) {
-                aux_x = aux_y->esq;
-            } else {
-                aux_x = aux_y->dir;
-            }
-            aux_x->pai = aux_y->pai;
-            no = 0;
+        if (!z->dir) {
+            // z nao tem filho da direita.
+            // sobe o filho da esquerda.
+            aux_x = z->esq;
+            aux_x_pai = z;
+            aux_x_pai = z->pai;
+            _rb_transplant(arvore, z, z->esq);
+
         } else {
-            // CASO 3: nó z tem os dois filhos.
-            // Substituir nó z pelo seu tree-sucessor.
-            // O sucessor de um  nó não tem filho da esquerda.
-            // OBS: o sucessor ou é filho imediato da direita,
-            // ou é filho da esquerda de alguem na sub-arvore da direita.
-            printf("\nCASO 3: no z tem os dois filhos.\n");
-            aux_y = TreeSucessor(no);
-            printf("\n Y = %d.\n", aux_y->pai->dado);
-            aux_x = aux_y->dir;  // pois o sucessor nao tem esquerda
-            no->dado = aux_y->dado;
-            printf("\nfilho da direita da raiz == %d\n", no->dir);
-            // verificar se y é filho da esquerda ou direita
-            // e atribuir x. x é o temporario com a sub-arvore filha de y.
-            if (aux_y == aux_y->pai->esq) {
-                printf("\nIFFFF\n");
-                aux_y->pai->esq = aux_x;
-                printf("\nfilho da direita da raiz == %d\n", no->dir);
-            } else {
-                printf("\nELSEEE\n");
-                aux_y->pai->dir = aux_x;
-                printf("\nfilho da direita da raiz == %d\n", no->dir);
+            // z tem os dois filhos.
+            //  sobe seu sucessor na árvore.
+            aux_y = TreeSucessor(z);
+            cor_original_y = aux_y->cor;
+            aux_x = aux_y->dir;
+            if (aux_y->pai == z) {
+                // o sucessor de z é um filho direto.
+                if (aux_x) {
+                    aux_x->pai = aux_y;
+                    aux_x_pai = aux_y;  // ??? o pai de x já é Y
+                } else {
+                    // Y nao é filho direto. z possui uma arvore da direita.
+                    // portanto z.dir nao sera nulo
+                    _rb_transplant(arvore, aux_y, aux_y->dir);
+                    aux_y->dir = z->dir;
+                    aux_y->dir->pai = aux_y;
+                }
+                _rb_transplant(arvore, z, aux_y);
+                aux_y->esq = z->esq;
+                // z tem os dois filhos, portanto z.esq, q agora é tb o valor
+                // de y.esq, nao é nulo.
+                aux_y->esq->pai = aux_y;
+                aux_y->cor = z->cor;
             }
-            // printf("\nfilho da direita da raiz == %d\n", no->dir);
-            // aux_y = 0;
-            // printf("\nfilho da direita da raiz == %d\n", no->dir->dado);
         }
     }
-    if (aux_y && aux_y->cor == BLACK) {
-        printf("\nVai rodar FIXUP\n");
-        _rbdelete_fixup(arvore, aux_x);
+
+    if (cor_original_y == BLACK) {
+        _rbdelete_fixup(arvore, aux_x, aux_x_pai);
     }
     return;
 }
@@ -441,7 +471,8 @@ void _rbdelete(ArvoreRedBlack* arvore, NoArvore* no) {
 void Delete(ArvoreRedBlack* arvore, int elemento) {
     NoArvore* no = Search(arvore, elemento);
     if (no) {
-        printf("\nElemento [ %d ] encontrado. Prosseguindo com delete.\n", elemento);
+        printf("\nElemento [ %d ] encontrado. Prosseguindo com delete.\n"
+        , elemento);
         return _rbdelete(arvore, no);
     }
     printf("\nElemento [ %d ] nao pertence a arvore.\n", elemento);
