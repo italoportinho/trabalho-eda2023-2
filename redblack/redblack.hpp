@@ -271,7 +271,7 @@ NoArvoreRB* TreeSucessor(NoArvoreRB* no) {
     return aux_y;
 }
 
-NoArvoreRB* Search(ArvoreRedBlack* arvore, int elemento) {
+NoArvoreRB* SearchRB(ArvoreRedBlack* arvore, int elemento) {
     // COMPLEXIDADE: O(lg_n) - percorre no maximo um caminho descendente
     NoArvoreRB* no = arvore->raiz;
     while (no != 0 && no->dado != elemento) {
@@ -460,7 +460,7 @@ void _rbdelete(ArvoreRedBlack* arvore, NoArvoreRB* z) {
 }
 
 void DeleteRB(ArvoreRedBlack* arvore, int elemento) {
-    NoArvoreRB* no = Search(arvore, elemento);
+    NoArvoreRB* no = SearchRB(arvore, elemento);
     if (no) {
         // printf("\nElemento [ %d ] encontrado. Prosseguindo com delete.\n"
         //, elemento);

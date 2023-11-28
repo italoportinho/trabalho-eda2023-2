@@ -1,0 +1,10 @@
+teste intensivo em inserts/deletes
+
+RAIZ RB	 == 15724 , 	altura RB  == 20 , 	deletes RB  == 998 , 	RB ms  == 26.000000
+RAIZ AVL == 18467 , 	altura AVL == 18 , 	deletes AVL == 998 , 	AVL ms == 45.000000
+						deletes MAP == 998, 	MAP ms == 53.000000
+
+teste intensivo em buscas
+RAIZ RB  == 15724 , altura RB  == 20 , deletes RB  == 998 , RB ms  == 29.000000 , search_hits_RB  == 94336 ,  RB_search_ms ms == 24.000000
+RAIZ_AVL == 18467 , altura_AVL == 18 , deletes_AVL == 998 , AVL_ms == 55.000000 , search_hits_AVL == 94388 ,  	AVL_search_ms == 21.000000
+				       deletes_MAP == 998 , MAP_ms == 54.000000 , MAP_search_hits == 94388 , 	MAP_search_ms == 49.000000

@@ -436,3 +436,16 @@ NoArvore* Delete(NoArvore* root, int key) {
 
     return root;
 }
+
+NoArvore* Search(NoArvore* no, int elemento) {
+    // COMPLEXIDADE: O(lg_n) - percorre no maximo um caminho descendente
+    while (no != 0 && no->dado != elemento) {
+        if (elemento < no->dado) {
+            no = no->esq;
+        } else {
+            no = no->dir;
+        }
+    }
+    // printf("\nSearch == %d\n", no->dado);
+    return no;
+}
