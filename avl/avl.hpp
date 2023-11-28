@@ -338,6 +338,101 @@ int calculaAlturaAVL(NoArvore* no, int altura) {
     return max_altura;
 }
 
-void Delete(NoArvore* no) {
+NoArvore* TreeMinimum(NoArvore* no) {
+    // COMPLEXIDADE: O(lg_n) - percorre um caminho descendente na árvore
+    NoArvore* aux_x = no;
+    while (aux_x->esq != 0) {
+        // printf("\nTreeMinimum - no == %d\n", aux_x->dado);
+        aux_x = aux_x->esq;
+    }
+    // printf("\nTreeMinimum final == %d\n", aux_x->dado);
+    return aux_x;
+}
 
+NoArvore* Delete(NoArvore* root, int key) {
+// STEP 1: PERFORM STANDARD BST DELETE
+    if (root == 0)
+        return root;
+
+    // If the key to be deleted is smaller
+    // than the root's key, then it lies
+    // in left subtree
+    if (key < root->dado) {
+        root->esq = Delete(root->esq, key);
+
+    // If the key to be deleted is greater
+    // than the root's key, then it lies
+    // in right subtree
+    } else if (key > root->dado) {
+        root->dir = Delete(root->dir, key);
+    }
+
+    // if key is same as root's key, then
+    // This is the node to be deleted
+    else {
+        // node with only one child or no child
+        if ((root->esq == 0) || (root->dir == 0)) {
+            NoArvore *temp = root->esq ? root->esq : root->dir;
+
+            // No child case
+            if (temp == 0) {
+                temp = root;
+                root = 0;
+            } else {
+                // One child case
+                *root = *temp;  // Copy the contents of the non-empty child
+            }
+            free(temp);
+        }
+        else {
+            // node with two children: Get the inorder
+            // successor (smallest in the right subtree)
+            NoArvore* temp = TreeMinimum(root->dir);
+
+            // Copy the inorder successor's
+            // data to this node
+            root->dado = temp->dado;
+
+            // Delete the inorder successor
+            root->dir = Delete(root->dir, temp->dado);
+        }
+    }
+
+    // If the tree had only one node
+    // then return
+    if (root == 0)
+        return root;
+
+    // STEP 2: UPDATE HEIGHT OF THE CURRENT NODE
+    root->altura = 1 + maior(altura(root->esq), altura(root->dir));
+
+    // STEP 3: GET THE BALANCE FACTOR OF
+    // THIS NODE (to check whether this
+    // node became unbalanced)
+    int balance = fatorBalanceamento(root);
+
+    // If this node becomes unbalanced,
+    // then there are 4 cases
+
+    // Left Left Case
+    if (balance > 1 && fatorBalanceamento(root->esq) >= 0)
+        return RightRotateAlt(root);
+
+    // Left Right Case
+    if (balance > 1 && fatorBalanceamento(root->esq) < 0) {
+        root->esq = LeftRotateAlt(root->esq);
+        return RightRotateAlt(root);
+    }
+
+    // Right Right Case
+    if (balance < -1 && fatorBalanceamento(root->dir) <= 0)
+        return LeftRotateAlt(root);
+
+    // Right Left Case
+    if (balance < -1 && fatorBalanceamento(root->dir) > 0) {
+        root->dir = RightRotateAlt(root->dir);
+        return LeftRotateAlt(root);
+    }
+
+    return root;
 }

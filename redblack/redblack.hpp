@@ -256,7 +256,7 @@ NoArvoreRB* TreeMinimum(NoArvoreRB* no) {
 NoArvoreRB* TreeSucessor(NoArvoreRB* no) {
     // COMPLEXIDADE: O(lg_n) - percorre no maximo um caminho descendente ou
     // ascendente na árvore.
-    // Se houver filho direito, o sucesso sera o minimo dessa subarvore.
+    // Se houver filho direito, o sucessor sera o minimo dessa subarvore.
     NoArvoreRB* aux_x = no;
     if (aux_x->dir != 0) {
         return TreeMinimum(aux_x->dir);
@@ -287,10 +287,12 @@ NoArvoreRB* Search(ArvoreRedBlack* arvore, int elemento) {
 
 void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvoreRB* x, NoArvoreRB* x_pai) {
     NoArvoreRB* irmao = 0;
-    while (x != arvore->raiz && (x == 0 || x->cor == BLACK)) {
-        // printf("\nwhile...\n");
-        // printf("\nX == %d\n", x ? x->dado : 0);
-        // printf("\nX.pai == %d\n", x_pai ? x_pai->dado : 0);
+    bool continuar = true;
+    while (continuar && x != arvore->raiz && (x == 0 || x->cor == BLACK)) {
+        //printf("\nwhile...\n");
+        //printf("\nX == %d\n", x ? x->dado : 0);
+        //printf("\nX_pai == %d\n", x_pai ? x_pai->dado : 0);
+        // printf("\nX.pai == %d\n", x->pai ? x->pai->dado : 0);
         if (x == x_pai->esq) {
             // X é filho da esquerda
             irmao = x_pai->dir;
@@ -300,13 +302,13 @@ void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvoreRB* x, NoArvoreRB* x_pai) {
             // printf("\nirmao.dir == %d\n", irmao->dir ? irmao->dir->dado : 0);
             if (irmao) {
                 if (irmao->cor == RED) {
-                    // printf("\nDELETE FIX CASO 1 - irmão vermelho\n");
+                    //printf("\nDELETE FIX CASO 1 - irmão vermelho\n");
                     irmao->cor = BLACK;
                     x_pai->cor = RED;
                     LeftRotateRB(arvore, x_pai);
                 }
                 if((!irmao->esq || irmao->esq->cor == BLACK) && (!irmao->dir || irmao->dir->cor == BLACK)) {
-                    // printf("\nDELETE FIX CASO 2 - irmao com ambos filhos pretos\n");
+                    //printf("\nDELETE FIX CASO 2 - irmao com ambos filhos pretos\n");
                     // printf("\nX == %d\n", x ? x->dado : 0);
                     irmao->cor = RED;
                     x = x_pai;
@@ -314,7 +316,7 @@ void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvoreRB* x, NoArvoreRB* x_pai) {
                     // printf("\nNOVO X == %d\n", x ? x->dado : 0);
                 } else {
                     if (irmao->dir && irmao->dir->cor == BLACK) {
-                        // printf("\nDELETE FIX CASO 3 - irmao possui um filho preto\n");
+                        //printf("\nDELETE FIX CASO 3 - irmao possui um filho preto\n");
                         if (irmao->esq) {
                             irmao->esq->cor = BLACK;
                         }
@@ -322,7 +324,7 @@ void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvoreRB* x, NoArvoreRB* x_pai) {
                         RightRotateRB(arvore, irmao);
                         irmao = x_pai->dir;
                     }
-                    // printf("\nDELETE FIX CASO 4 - irmao tem filho vermehlo\n");
+                    //printf("\nDELETE FIX CASO 4 - irmao tem filho vermehlo\n");
                     irmao->cor = x_pai->cor;
                     x_pai->cor = BLACK;
                     if (irmao->dir) {
@@ -338,13 +340,13 @@ void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvoreRB* x, NoArvoreRB* x_pai) {
             irmao = x_pai->esq;
             if (irmao) {
                 if (irmao->cor == RED) {
-                    // printf("\nDELETE FIX CASO 1 - irmão vermelho\n");
+                    //printf("\nDELETE FIX CASO 1 - irmão vermelho\n");
                     irmao->cor = BLACK;
                     x_pai->cor = RED;
                     RightRotateRB(arvore, x_pai);
                 }
                 if((!irmao->esq || irmao->esq->cor == BLACK) && (!irmao->dir || irmao->dir->cor == BLACK)) {
-                    // printf("\nDELETE FIX CASO 2 - irmao com ambos filhos pretos\n");
+                    //printf("\nDELETE FIX CASO 2 - irmao com ambos filhos pretos\n");
                     // printf("\nX == %d\n", x ? x->dado : 0);
                     irmao->cor = RED;
                     x = x_pai;
@@ -352,7 +354,7 @@ void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvoreRB* x, NoArvoreRB* x_pai) {
                     // printf("\nNOVO X == %d\n", x ? x->dado : 0);
                 } else {
                     if (irmao->esq && irmao->esq->cor == BLACK) {
-                        // printf("\nDELETE FIX CASO 3 - irmao possui um filho preto\n");
+                        //printf("\nDELETE FIX CASO 3 - irmao possui um filho preto\n");
                         if (irmao->dir) {
                             irmao->dir->cor = BLACK;
                         }
@@ -360,7 +362,7 @@ void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvoreRB* x, NoArvoreRB* x_pai) {
                         LeftRotateRB(arvore, irmao);
                         irmao = x_pai->esq;
                     }
-                    // printf("\nDELETE FIX CASO 4 - irmao tem filho vermehlo\n");
+                    //printf("\nDELETE FIX CASO 4 - irmao tem filho vermehlo\n");
                     irmao->cor = x_pai->cor;
                     x_pai->cor = BLACK;
                     if (irmao->esq) {
@@ -372,6 +374,8 @@ void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvoreRB* x, NoArvoreRB* x_pai) {
                 }
             }
         }
+        if (irmao == 0)
+            continuar = false;
     }
     if (x) {
         x->cor = BLACK;
@@ -455,7 +459,7 @@ void _rbdelete(ArvoreRedBlack* arvore, NoArvoreRB* z) {
     return;
 }
 
-void Delete(ArvoreRedBlack* arvore, int elemento) {
+void DeleteRB(ArvoreRedBlack* arvore, int elemento) {
     NoArvoreRB* no = Search(arvore, elemento);
     if (no) {
         // printf("\nElemento [ %d ] encontrado. Prosseguindo com delete.\n"
