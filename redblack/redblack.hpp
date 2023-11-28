@@ -2,40 +2,26 @@
 #include <cstdio>
 #include <string>
 enum color { RED, BLACK };
-class NoArvore {
+class NoArvoreRB {
  public:
     int dado;
     color cor;
-    NoArvore* esq;
-    NoArvore* dir;
-    NoArvore* pai;
+    NoArvoreRB* esq;
+    NoArvoreRB* dir;
+    NoArvoreRB* pai;
 };
 
 class ArvoreRedBlack {
  public:
-    NoArvore* raiz;
+    NoArvoreRB* raiz;
 };
-
-//-------------------------------------------------------------------
-//  b)      Percurso em pós-ordem (esq, dir, nó)
-//-------------------------------------------------------------------
-void pos_ordem(NoArvore* no) {
-    if (no->esq) {
-        pos_ordem(no->esq);
-    }
-    if (no->dir) {
-        pos_ordem(no->dir);
-    }
-    printf("%d ", no->dado);
-    return;
-}
 
 //-------------------------------------------------------------------
 //  c)      Percurso em-ordem (esq, no, dir)
 //-------------------------------------------------------------------
-void em_ordem(NoArvore* no) {
+void em_ordemRB(NoArvoreRB* no) {
     if (no->esq) {
-        em_ordem(no->esq);
+        em_ordemRB(no->esq);
     }
     printf("%d[", no->dado);
     if (no->cor) {
@@ -50,34 +36,20 @@ void em_ordem(NoArvore* no) {
     }
 
     if (no->dir) {
-        em_ordem(no->dir);
+        em_ordemRB(no->dir);
     }
     return;
 }
 
-//-------------------------------------------------------------------
-//  d)      Percurso em pré-ordem (no, esq, dir)
-//-------------------------------------------------------------------
-void pre_ordem(NoArvore* no) {
-    printf("%d ", no->dado);
-    if (no->esq) {
-        pre_ordem(no->esq);
-    }
-    if (no->dir) {
-        pre_ordem(no->dir);
-    }
-    return;
-}
-
-void RightRotate(ArvoreRedBlack* arvore, NoArvore* no) {
+void RightRotateRB(ArvoreRedBlack* arvore, NoArvoreRB* no) {
     // Complexidade: O(1)
     // A esquerda do nó x vira a dir do seu filho da esquerda y.
     // E X vira filho da direita de Y
     // obs: tem que ter Y, senão nao tem oq rotacionar.
-    printf("\nRIGHT-ROTATE\n");
-    printf("\n X = %d\n", no->dado);
-    printf("\n Y = %d\n", no->esq->dado);
-    NoArvore* aux_y = no->esq;
+    // printf("\nRIGHT-ROTATE\n");
+    // printf("\n X = %d\n", no->dado);
+    // printf("\n Y = %d\n", no->esq->dado);
+    NoArvoreRB* aux_y = no->esq;
 
     // O pai de y agora é o pai de x.
     aux_y->pai = no->pai;
@@ -107,15 +79,15 @@ void RightRotate(ArvoreRedBlack* arvore, NoArvore* no) {
     return;
 }
 
-void LeftRotate(ArvoreRedBlack* arvore, NoArvore* no /* X */) {
+void LeftRotateRB(ArvoreRedBlack* arvore, NoArvoreRB* no /* X */) {
     // Complexidade: O(1)
     // A direita do nó x vira a esquerda do seu filho da direita y.
     // E x vira filho da esquerda de Y
     // obs: tem que ter Y, senão nao tem oq rotacionar.
-    printf("\nLEFT-ROTATE\n");
-    printf("\n X = %d\n", no->dado);
-    printf("\n Y = %d\n", no->dir ? no->dir->dado : 0);
-    NoArvore* aux_y = no->dir;
+    // printf("\nLEFT-ROTATE\n");
+    // printf("\n X = %d\n", no->dado);
+    // printf("\n Y = %d\n", no->dir ? no->dir->dado : 0);
+    NoArvoreRB* aux_y = no->dir;
 
     // O pai de y agora é o pai de x.
     aux_y->pai = no->pai;
@@ -145,15 +117,15 @@ void LeftRotate(ArvoreRedBlack* arvore, NoArvore* no /* X */) {
     return;
 }
 
-NoArvore* _rbinsert_fixup(ArvoreRedBlack* arvore, NoArvore* no) {
+NoArvoreRB* _rbinsert_fixup(ArvoreRedBlack* arvore, NoArvoreRB* no) {
     // O no inserido (z) é sempre vermelho.
     // Se z nao tiver pai, entao é a raíz e sera colorido no final da função.
     // Se z tiver pai e este for vermelho, é uma violação da regra RB e será
     // corrigido, pois o pai de um nó vermelho sempre deve ser preto.
     // Também, se z tem um pai vermelho, então é garantido que exista
     // o pai do pai de z, seu avô.
-    NoArvore* aux_y;
-    NoArvore* aux_z = no;
+    NoArvoreRB* aux_y;
+    NoArvoreRB* aux_z = no;
 
     while (aux_z->pai != 0 && aux_z->pai->cor == RED) {
         // testa se o pai de z é filho da esquerda.
@@ -162,7 +134,7 @@ NoArvore* _rbinsert_fixup(ArvoreRedBlack* arvore, NoArvore* no) {
             aux_y = aux_z->pai->pai->dir;
             if (aux_y != 0 && aux_y->cor == RED) {
                 // CASO 1
-                printf("\nCASO 1 (IF) - TIO VERMELHO\n");
+                // printf("\nCASO 1 (IF) - TIO VERMELHO\n");
                 aux_z->pai->cor = BLACK;
                 aux_y->cor = BLACK;
                 aux_z->pai->pai->cor = RED;
@@ -173,14 +145,14 @@ NoArvore* _rbinsert_fixup(ArvoreRedBlack* arvore, NoArvore* no) {
                 if (aux_z == aux_z->pai->dir) {
                     // CASO 2: z é filho da direita
                     aux_z = aux_z->pai;
-                    printf("\n CASO 2: z,pai e avo formam triang. Rotac pai\n");
-                    LeftRotate(arvore, aux_z);
+                    // printf("\n CASO 2: z,pai e avo formam triang. Rotac pai\n");
+                    LeftRotateRB(arvore, aux_z);
                 } else {
                     // CASO 3: z é filho da esquerda
                     aux_z->pai->cor = BLACK;
                     aux_z->pai->pai->cor = RED;
-                    printf("\n CASO 3: z,pai e avo formam linha. Rotac avo\n");
-                    RightRotate(arvore, aux_z->pai->pai);
+                    // printf("\n CASO 3: z,pai e avo formam linha. Rotac avo\n");
+                    RightRotateRB(arvore, aux_z->pai->pai);
                 }
             }
         } else {
@@ -191,7 +163,7 @@ NoArvore* _rbinsert_fixup(ArvoreRedBlack* arvore, NoArvore* no) {
             aux_y = aux_z->pai->pai->esq;
             if (aux_y != 0 && aux_y->cor == RED) {
                 // CASO 1
-                printf("\nCASO 1.dir (ELSE) - TIO VERMELHO\n");
+                // printf("\nCASO 1.dir (ELSE) - TIO VERMELHO\n");
                 aux_z->pai->cor = BLACK;
                 aux_y->cor = BLACK;
                 aux_z->pai->pai->cor = RED;
@@ -200,14 +172,14 @@ NoArvore* _rbinsert_fixup(ArvoreRedBlack* arvore, NoArvore* no) {
                 // CASO 2
                 if (aux_z == aux_z->pai->esq) {
                     aux_z = aux_z->pai;
-                    printf("\n CASO 2.dir: z,pai,avo formam triang. Rot pai\n");
-                    RightRotate(arvore, aux_z);
+                    // printf("\n CASO 2.dir: z,pai,avo formam triang. Rot pai\n");
+                    RightRotateRB(arvore, aux_z);
                 } else {
                     // CASO 3: z é filho da direita
                     aux_z->pai->cor = BLACK;
                     aux_z->pai->pai->cor = RED;
-                    printf("\n CASO 3.dir: z,pai,avo formam linha. Rot avo\n");
-                    LeftRotate(arvore, aux_z->pai->pai);
+                    // printf("\n CASO 3.dir: z,pai,avo formam linha. Rot avo\n");
+                    LeftRotateRB(arvore, aux_z->pai->pai);
                 }
             }
         }
@@ -216,13 +188,13 @@ NoArvore* _rbinsert_fixup(ArvoreRedBlack* arvore, NoArvore* no) {
     return no;
 }
 
-NoArvore* _rbinsert(ArvoreRedBlack* arvore, NoArvore* no) {
+NoArvoreRB* _rbinsert(ArvoreRedBlack* arvore, NoArvoreRB* no) {
     // Fazer o percurso descendente na árvore,
     // guardando o pai(y), para encontrar a posição de inserção(x).
     // Complexidade: O(lg n)
     // - A mesma de uma busca em uma Árvore Binária de Busca.
-    NoArvore* _pai = 0;
-    NoArvore* _posicao = arvore->raiz;
+    NoArvoreRB* _pai = 0;
+    NoArvoreRB* _posicao = arvore->raiz;
     while (_posicao != 0) {
         _pai = _posicao;
         if (no->dado < _posicao->dado) {
@@ -250,12 +222,12 @@ NoArvore* _rbinsert(ArvoreRedBlack* arvore, NoArvore* no) {
     return _rbinsert_fixup(arvore, no);
 }
 
-NoArvore* Insert(ArvoreRedBlack* arvore, int elemento) {
-    printf("\n*************************************************\n");
-    printf("**************** Inserindo %d *******************", elemento);
-    printf("\n*************************************************\n");
+NoArvoreRB* Insert(ArvoreRedBlack* arvore, int elemento) {
+    // printf("\n*************************************************\n");
+    // printf("**************** Inserindo %d *******************", elemento);
+    // printf("\n*************************************************\n");
 
-    NoArvore* new_node = new NoArvore {
+    NoArvoreRB* new_node = new NoArvoreRB {
         .dado = elemento
         , .cor = RED
         , .esq = 0
@@ -266,9 +238,9 @@ NoArvore* Insert(ArvoreRedBlack* arvore, int elemento) {
     return _rbinsert(arvore, new_node);
 }
 
-NoArvore* TreeMinimum(NoArvore* no) {
+NoArvoreRB* TreeMinimum(NoArvoreRB* no) {
     // COMPLEXIDADE: O(lg_n) - percorre um caminho descendente na árvore
-    NoArvore* aux_x = no;
+    NoArvoreRB* aux_x = no;
     while (aux_x->esq != 0) {
         // printf("\nTreeMinimum - no == %d\n", aux_x->dado);
         aux_x = aux_x->esq;
@@ -277,15 +249,15 @@ NoArvore* TreeMinimum(NoArvore* no) {
     return aux_x;
 }
 
-NoArvore* TreeSucessor(NoArvore* no) {
+NoArvoreRB* TreeSucessor(NoArvoreRB* no) {
     // COMPLEXIDADE: O(lg_n) - percorre no maximo um caminho descendente ou
     // ascendente na árvore.
     // Se houver filho direito, o sucesso sera o minimo dessa subarvore.
-    NoArvore* aux_x = no;
+    NoArvoreRB* aux_x = no;
     if (aux_x->dir != 0) {
         return TreeMinimum(aux_x->dir);
     }
-    NoArvore* aux_y = aux_x->pai;
+    NoArvoreRB* aux_y = aux_x->pai;
     // Nao havendo filho direito, subimos na arvore atualizando y e o no (x)
     // para seus pais, até que y seja um filho da esquerda, ou nulo(raíz)
     while (aux_y != 0 && aux_x == aux_y->dir) {
@@ -295,9 +267,9 @@ NoArvore* TreeSucessor(NoArvore* no) {
     return aux_y;
 }
 
-NoArvore* Search(ArvoreRedBlack* arvore, int elemento) {
+NoArvoreRB* Search(ArvoreRedBlack* arvore, int elemento) {
     // COMPLEXIDADE: O(lg_n) - percorre no maximo um caminho descendente
-    NoArvore* no = arvore->raiz;
+    NoArvoreRB* no = arvore->raiz;
     while (no != 0 && no->dado != elemento) {
         if (elemento < no->dado) {
             no = no->esq;
@@ -305,51 +277,51 @@ NoArvore* Search(ArvoreRedBlack* arvore, int elemento) {
             no = no->dir;
         }
     }
-    printf("\nSearch == %d\n", no->dado);
+    // printf("\nSearch == %d\n", no->dado);
     return no;
 }
 
-void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvore* x, NoArvore* x_pai) {
-    NoArvore* irmao = 0;
+void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvoreRB* x, NoArvoreRB* x_pai) {
+    NoArvoreRB* irmao = 0;
     while (x != arvore->raiz && (x == 0 || x->cor == BLACK)) {
-        printf("\nX == %d\n", x ? x->dado : 0);
-        printf("\nX.pai == %d\n", x_pai ? x_pai->dado : 0);
+        // printf("\nX == %d\n", x ? x->dado : 0);
+        // printf("\nX.pai == %d\n", x_pai ? x_pai->dado : 0);
         if (x == x_pai->esq) {
             // X é filho da esquerda
             irmao = x_pai->dir;
-            printf("\nirmao == %d\n", irmao->dado);
-            printf("\nirmao.cor == %d\n", irmao->cor);
-            printf("\nirmao.esq == %d\n", irmao->esq ? irmao->esq->dado : 0);
-            printf("\nirmao.dir == %d\n", irmao->dir ? irmao->dir->dado : 0);
+            // printf("\nirmao == %d\n", irmao->dado);
+            // printf("\nirmao.cor == %d\n", irmao->cor);
+            // printf("\nirmao.esq == %d\n", irmao->esq ? irmao->esq->dado : 0);
+            // printf("\nirmao.dir == %d\n", irmao->dir ? irmao->dir->dado : 0);
             if (irmao) {
                 if (irmao->cor == RED) {
-                    printf("\nDELETE FIX CASO 1 - irmão vermelho\n");
+                    // printf("\nDELETE FIX CASO 1 - irmão vermelho\n");
                     irmao->cor = BLACK;
                     x_pai->cor = RED;
-                    LeftRotate(arvore, x_pai);
+                    LeftRotateRB(arvore, x_pai);
                 }
                 if((!irmao->esq || irmao->esq->cor == BLACK) && (!irmao->dir || irmao->dir->cor == BLACK)) {
-                    printf("\nDELETE FIX CASO 2 - irmao com ambos filhos pretos\n");
+                    // printf("\nDELETE FIX CASO 2 - irmao com ambos filhos pretos\n");
                     irmao->cor = RED;
                     x = x_pai;
-                    printf("\nNOVO X == %d\n", x ? x->dado : 0);
+                    // printf("\nNOVO X == %d\n", x ? x->dado : 0);
                 } else {
                     if (irmao->dir && irmao->dir->cor == BLACK) {
-                        printf("\nDELETE FIX CASO 3 - irmao possui um filho preto\n");
+                        // printf("\nDELETE FIX CASO 3 - irmao possui um filho preto\n");
                         if (irmao->esq) {
                             irmao->esq->cor = BLACK;
                         }
                         irmao->cor = RED;
-                        RightRotate(arvore, irmao);
+                        RightRotateRB(arvore, irmao);
                         irmao = x_pai->dir;
                     }
-                    printf("\nDELETE FIX CASO 4 - irmao tem filho vermehlo\n");
+                    // printf("\nDELETE FIX CASO 4 - irmao tem filho vermehlo\n");
                     irmao->cor = x_pai->cor;
                     x_pai->cor = BLACK;
                     if(irmao->dir) {
                         irmao->dir->cor = BLACK;
                     }
-                    LeftRotate(arvore, x_pai);
+                    LeftRotateRB(arvore, x_pai);
                     x = arvore->raiz;
                 }
             }
@@ -358,32 +330,32 @@ void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvore* x, NoArvore* x_pai) {
             irmao = x_pai->esq;
             if (irmao) {
                 if (irmao->cor == RED) {
-                    printf("\nDELETE FIX CASO 1 - irmão vermelho\n");
+                    // printf("\nDELETE FIX CASO 1 - irmão vermelho\n");
                     irmao->cor = BLACK;
                     x_pai->cor = RED;
-                    RightRotate(arvore, x_pai);
+                    RightRotateRB(arvore, x_pai);
                 }
                 if((!irmao->esq || irmao->esq->cor == BLACK) && (!irmao->dir || irmao->dir->cor == BLACK)) {
-                    printf("\nDELETE FIX CASO 2 - irmao com ambos filhos pretos\n");
+                    // printf("\nDELETE FIX CASO 2 - irmao com ambos filhos pretos\n");
                     irmao->cor = RED;
                     x = x_pai;
                 } else {
                     if (irmao->esq && irmao->esq->cor == BLACK) {
-                        printf("\nDELETE FIX CASO 3 - irmao possui um filho preto\n");
+                        // printf("\nDELETE FIX CASO 3 - irmao possui um filho preto\n");
                         if (irmao->dir) {
                             irmao->dir->cor = BLACK;
                         }
                         irmao->cor = RED;
-                        LeftRotate(arvore, irmao);
+                        LeftRotateRB(arvore, irmao);
                         irmao = x_pai->esq;
                     }
-                    printf("\nDELETE FIX CASO 4 - irmao tem filho vermehlo\n");
+                    // printf("\nDELETE FIX CASO 4 - irmao tem filho vermehlo\n");
                     irmao->cor = x_pai->cor;
                     x_pai->cor = BLACK;
                     if(irmao->esq) {
                         irmao->esq->cor = BLACK;
                     }
-                    RightRotate(arvore, x_pai);
+                    RightRotateRB(arvore, x_pai);
                     x = arvore->raiz;
                 }
             }
@@ -396,7 +368,7 @@ void _rbdelete_fixup(ArvoreRedBlack* arvore, NoArvore* x, NoArvore* x_pai) {
 }
 
 // Desfaz a conexão entre os nos u e v. e seta o pai de v como o pai de u.
-void _rb_transplant(ArvoreRedBlack* T, NoArvore* u, NoArvore* v) {
+void _rb_transplant(ArvoreRedBlack* T, NoArvoreRB* u, NoArvoreRB* v) {
     if (u->pai == 0) {
         T->raiz = v;
         v->pai = 0;
@@ -413,10 +385,10 @@ void _rb_transplant(ArvoreRedBlack* T, NoArvore* u, NoArvore* v) {
     return;
 }
 
-void _rbdelete(ArvoreRedBlack* arvore, NoArvore* z) {
-    NoArvore* aux_y = z;
-    NoArvore* aux_x = 0;
-    NoArvore* aux_x_pai = 0;
+void _rbdelete(ArvoreRedBlack* arvore, NoArvoreRB* z) {
+    NoArvoreRB* aux_y = z;
+    NoArvoreRB* aux_x = 0;
+    NoArvoreRB* aux_x_pai = 0;
     color cor_original_y = aux_y->cor;
 
     if (!z->esq) {
@@ -472,13 +444,27 @@ void _rbdelete(ArvoreRedBlack* arvore, NoArvore* z) {
 }
 
 void Delete(ArvoreRedBlack* arvore, int elemento) {
-    NoArvore* no = Search(arvore, elemento);
+    NoArvoreRB* no = Search(arvore, elemento);
     if (no) {
-        printf("\nElemento [ %d ] encontrado. Prosseguindo com delete.\n"
-        , elemento);
+        // printf("\nElemento [ %d ] encontrado. Prosseguindo com delete.\n"
+        //, elemento);
         return _rbdelete(arvore, no);
     }
     printf("\nElemento [ %d ] nao pertence a arvore.\n", elemento);
     return;
 }
 
+int maiorRB(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+int calculaAltura(NoArvoreRB* no, int altura) {
+    if (!no) {
+        return 0;
+    }
+    int altura_esq = calculaAltura(no->esq, altura);
+    int altura_dir = calculaAltura(no->dir, altura);
+    int max_altura = maiorRB(altura_esq, altura_dir) + 1;
+
+    return max_altura;
+}
