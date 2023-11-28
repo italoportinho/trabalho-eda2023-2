@@ -1,13 +1,22 @@
 // Copyright (C) 2023 - Italo Portinho
 // Para compilar(windows): g++ main.cpp -o main
 #include <cstdio>
+#include <cstdlib>
 // #include "./redblack/redblack.hpp"
 #include "./avl/avl.hpp"
 
 int main() {
     // ArvoreRedBlack* minha_arvore = new ArvoreRedBlack { .raiz = 0};
     ArvoreAVL* minha_arvore = new ArvoreAVL{ .raiz = 0 };
+    int chave = 0;
+    for (size_t i = 0; i < 100; i++) {
+        chave = rand();
+        printf("\nInserindo %d", chave);
+        InsertIt(minha_arvore, chave);
+    }
+    printf("\nterminou o FOR");
 
+/*
     NoArvore* no_onze = InsertIt(minha_arvore, 11);
     NoArvore* no_dois = InsertIt(minha_arvore,  2);
     NoArvore* no_catorze = InsertIt(minha_arvore, 14);
@@ -16,7 +25,7 @@ int main() {
     NoArvore* no_sete = InsertIt(minha_arvore, 7);
     NoArvore* no_quatro  = InsertIt(minha_arvore, 4);
     NoArvore* no_um  = InsertIt(minha_arvore, 1);
-    NoArvore* no_cinco  = InsertIt(minha_arvore, 5);/*
+    NoArvore* no_cinco  = InsertIt(minha_arvore, 5);
 
     
     NoArvore* no_onze = Insert(minha_arvore, minha_arvore->raiz, 0, 11);

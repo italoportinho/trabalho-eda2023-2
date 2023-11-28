@@ -50,12 +50,12 @@ NoArvore* RightRotate(ArvoreAVL* arvore, NoArvore* no) {
     // A esquerda do nó x vira a dir do seu filho da esquerda y.
     // E X vira filho da direita de Y
     // obs: tem que ter Y, senão nao tem oq rotacionar.
-    printf("\nRIGHT-ROTATE\n");
-    printf("\n X = %d\n", no->dado);
-    printf("\n PAI DO X = %d\n", no->pai->dado);
-    printf("\n Y = %d\n", no->esq->dado);
+    printf("\nRIGHT-ROTATE(%d)\n", no->dado);
+    //printf("\n X = %d\n", no->dado);
+    //printf("\n PAI DO X = %d\n", no->pai->dado);
+    //printf("\n Y = %d\n", no->esq->dado);
     NoArvore* aux_y = no->esq;
-    printf("\n PAI DO Y = %d\n", aux_y->pai->dado);
+    //printf("\n PAI DO Y = %d\n", aux_y->pai->dado);
     // O pai de y agora é o pai de x.
     aux_y->pai = no->pai;
 
@@ -86,8 +86,8 @@ NoArvore* RightRotate(ArvoreAVL* arvore, NoArvore* no) {
     // Atualiza a altura
     no->altura = 1 + maior(altura(no->esq), altura(no->dir));
     aux_y->altura = 1 + maior(altura(aux_y->esq), altura(aux_y->dir));
-    printf("\n PAI DO X = %d\n", no->pai->dado);
-    printf("\n PAI DO Y = %d\n", aux_y->pai->dado);
+    //printf("\n PAI DO X = %d\n", no->pai->dado);
+    //printf("\n PAI DO Y = %d\n", aux_y->pai->dado);
     return no;
 }
 
@@ -96,12 +96,12 @@ NoArvore* LeftRotate(ArvoreAVL* arvore, NoArvore* no /* X */) {
     // A direita do nó x vira a esquerda do seu filho da direita y.
     // E x vira filho da esquerda de Y
     // obs: tem que ter Y, senão nao tem oq rotacionar.
-    printf("\nLEFT-ROTATE\n");
-    printf("\n X = %d\n", no->dado);
-    printf("\n Y = %d\n", no->dir ? no->dir->dado : 0);
+    printf("\nLEFT-ROTATE(%d)\n", no->dado);
+    //printf("\n X = %d\n", no->dado);
+    //printf("\n Y = %d\n", no->dir ? no->dir->dado : 0);
     NoArvore* aux_y = no->dir;
-    printf("\n PAI DO X = %d\n", no->pai->dado);
-    printf("\n PAI DO Y = %d\n", aux_y->pai->dado);
+    //printf("\n PAI DO X = %d\n", no->pai->dado);
+    //printf("\n PAI DO Y = %d\n", aux_y->pai->dado);
     // O pai de y agora é o pai de x.
     aux_y->pai = no->pai;
 
@@ -131,8 +131,8 @@ NoArvore* LeftRotate(ArvoreAVL* arvore, NoArvore* no /* X */) {
     // Atualiza a altura
     no->altura = 1 + maior(altura(no->esq), altura(no->dir));
     aux_y->altura = 1 + maior(altura(aux_y->esq), altura(aux_y->dir));
-    printf("\n PAI DO X = %d\n", no->pai->dado);
-    printf("\n PAI DO Y = %d\n", aux_y->pai->dado);
+    printf("\n PAI DO X = %d\n", no->pai ? no->pai->dado : 0);
+    printf("\n PAI DO Y = %d\n", aux_y->pai ? aux_y->pai->dado : 0);
     return no;
 }
 
@@ -180,41 +180,47 @@ NoArvore* InsertIt(ArvoreAVL* arvore, int chave) {
         }
     }
     _posicao = no->pai;
+    int bf = 0;
     while (_posicao != 0) {
-        // printf("\nposicao = %d", _posicao->dado);
+        printf("\nposicao = %d", _posicao->dado);
         // printf(", altura = %d", _posicao->altura);
         _posicao->altura = 1 + maior(altura(_posicao->esq), altura(_posicao->dir));
         // printf(", NOVA_altura = %d", _posicao->altura);
 
         // Obter o Fator de balanceamento
-        int bf = fatorBalanceamento(_posicao);
+        bf = fatorBalanceamento(_posicao);
 
+        // printf("\nFator de Balanceamento(%d) == ", _posicao->dado);
+        printf("%d\n", bf);
         // Left Left Case
         if (bf > 1 && chave < _posicao->esq->dado) {
             printf("\nLeft Left Case: %d\n", _posicao->dado);
             RightRotate(arvore, _posicao);
+            bf = 0;
         }
 
         // Right Right Case
         if (bf < -1 && chave > _posicao->dir->dado) {
             printf("\nRight Right Case: %d\n", _posicao->dado);
             LeftRotate(arvore, _posicao);
+            bf = 0;
         }
 
         // Left Right Case
         if (bf > 1 && chave > _posicao->esq->dado) {
-            printf("\nLeft Right Case: %d\n",_posicao->dado);
+            printf("\nLeft Right Case: %d\n", _posicao->dado);
             LeftRotate(arvore, _posicao->esq);
             RightRotate(arvore, _posicao);
+            bf = 0;
         }
 
         // Right Left Case
         if (bf < -1 && chave < _posicao->dir->dado) {
-            printf("\nRight Left Case :%d\n", _posicao->dado);
+            printf("\nRight Left Case: %d\n", _posicao->dado);
             RightRotate(arvore, _posicao->dir);
             LeftRotate(arvore, _posicao);
+            bf = 0;
         }
-
         _posicao = _posicao->pai;
     }
     return no;
